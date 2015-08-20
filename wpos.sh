@@ -1,6 +1,8 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
+# Current folder
+cur_dir=`pwd`
 
 WPVER=""
 read -p "输入wordpress版本号！例如4.2.2：" WPVER
@@ -77,18 +79,10 @@ else
 wget https://cn.wordpress.org/$file_wp
 fi
 
-file_dtinc='dt_inc.tar.gz'
-if [ -f $file_dtinc ]; then
-echo "文件$file_dtinc已存在!开始解压......"
-else
-wget http://www.deep-time.com/plugins/dt_inc.tar.gz
-fi
 
 tar zxf $file_wp
-tar zxf dt_inc.tar.gz
-mv wordpress/* .
 # rm -rf *.tar.gz
-rm -rf wordpress
+cd wordpress
 rm -rf readme.html
 rm -rf license.txt
 rm -rf xmlrpc.php
@@ -98,7 +92,7 @@ rm -rf wp-content/themes/twentyfourteen
 rm -rf wp-content/themes/twentythirteen
 rm -rf wp-content/plugins/hello.php
 rm -rf wp-content/plugins/akismet
-
+mv $cur_dir/dt_inc .
 
 #6 修改wp配置文件
 sed -i '/WP_ZH_CN_ICP_NUM/ s/true/false/g' wp-config-sample.php
