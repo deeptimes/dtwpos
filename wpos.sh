@@ -3,52 +3,79 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 # Current folder
 cur_dir=`pwd`
-
+WEBPATH="/www/web"
+DATAPATH="/www/data"
 WPVER=""
 read -p "输入wordpress版本号！例如4.2.2：" WPVER
-if [ "$WPVER" = "" ]; then
-    echo "版本号不能为空!"
-    exit 1
-else
+while [ "$WPVER" = "" ]
+do
+    read -p "输入wordpress版本号！例如4.2.2：" WPVER
+done
 echo "===========================ok"
-fi
+
+
+VHOSTDIR=""
+
+read -p "输入站点目录名称，如(www_abc_com)：" VHOSTDIR
+while ( [ ! -d "$WEBPATH/$VHOSTDIR" ] || [ "$VHOSTDIR" = "" ] || [ "`ls -A $WEBPATH/$VHOSTDIR`" != "" ] )
+do
+    if [ ! -d "$WEBPATH/$VHOSTDIR" ];then
+        read -p "目录不存在：" VHOSTDIR
+
+    elif [ "$VHOSTDIR" = "" ];then
+        read -p "您还没有输入站点名称：" VHOSTDIR
+
+    elif [ "`ls -A $WEBPATH/$VHOSTDIR`" != "" ];then
+        read -p "此目录已有内容：" VHOSTDIR
+    fi
+done
+echo "===========================ok"
+
+
 
 DB_NAME=""
 read -p "输入数据库名：" DB_NAME
-if [ "$DB_NAME" = "" ]; then
-    echo "数据库名不能为空!"
-    exit 1
-else
+while ( [ -d "$DATAPATH/$DB_NAME" ] || [ "$DB_NAME" = "" ] )
+do
+    read -p "数据库已存在：" DB_NAME
+done
 echo "===========================ok"
-fi
+
+
+
 
 DB_USER=""
 read -p "输入数据库用户名：" DB_USER
-if [ "$DB_USER" = "" ]; then
-    echo "数据库用户名不能为空!"
-    exit 1
-else
+while [ "$DB_USER" = "" ]
+do
+    read -p "输入数据库用户名：" DB_USER
+done
 echo "===========================ok"
-fi
+
 
 DB_PASSWORD=""
 read -p "输入数据库密码：" DB_PASSWORD
-if [ "$DB_PASSWORD" = "" ]; then
-    echo "数据库密码不能为空"
-    exit 1
-else
+while [ "$DB_PASSWORD" = "" ]
+do
+    read -p "输入数据库密码：" DB_PASSWORD
+done
 echo "===========================ok"
-fi
 
 
-MYSQL_CMD="mysql -u${DB_USER} -p${DB_PASSWORD}"
-create_db_sql="create database IF NOT EXISTS ${DB_NAME}"
-echo ${create_db_sql}  | ${MYSQL_CMD}
+
+
+
+MYSQL_CMD="mysql -u${DB_USER} -p${DB_PASSWORD}" #数据库登录信息
+create_db_sql="create database IF NOT EXISTS ${DB_NAME}" #如果数据库不存在则创建
+echo ${stop_create}${create_db_sql} | ${MYSQL_CMD} #创建数据库  
+
 if [ $? -ne 0 ] #判断是否创建成功
 then
- echo "创建数据库${DBNAME} 失败..."
+ echo "创建数据库 ${DB_NAME} 失败 ..."
  exit 1
 fi
+
+echo "===========================ok"
 
 
 get_char()
@@ -64,6 +91,7 @@ stty $SAVEDSTTY
 
 echo "==========================="
 echo "Wordpress版本：$WPVER"
+echo "站点目录名称：$VHOSTDIR"
 echo "数据库名是：$DB_NAME"
 echo "数据库用户名是：$DB_USER"
 echo "数据库密码是：$DB_PASSWORD"
@@ -191,11 +219,14 @@ sed -i '/return/ s/\$fonts_url\;/\;/g' wp-content/themes/twentyfifteen/functions
 
 
 
-
 #7 设置站点文件权限
 find . -type f -exec chmod 644 {} \;
 find . -type d -exec chmod 755 {} \;
 find wp-content/ -type f -exec chmod 664 {} \;
 chown -R www:www .
+
+mv ./* $WEBPATH/$VHOSTDIR
+
+
 
 echo "安装成功......"

@@ -2,7 +2,7 @@
 进入你的虚拟主机的目录后按下面方式执行  
 
     wget https://github.com/Deep-Time/dtwpos/archive/master.zip  
-    unzip dtwpos-master.zip  
+    unzip master.zip  
     cd dtwpos-master  
     sh wpos.sh  
         
