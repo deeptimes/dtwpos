@@ -1,11 +1,9 @@
 ## 使用说明
 进入你的虚拟主机的目录后按下面方式执行  
-
-    `wget https://github.com/Deep-Time/dtwpos/archive/master.zip`  
-    `unzip dtwpos-master.zip`  
-    `cd dtwpos-master`  
-    `sh wpos.sh`  
-    
+    wget https://github.com/Deep-Time/dtwpos/archive/master.zip  
+    unzip dtwpos-master.zip  
+    cd dtwpos-master  
+    sh wpos.sh  
 
 
 ## 更新说明
