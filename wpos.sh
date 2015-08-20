@@ -79,7 +79,6 @@ else
 wget https://cn.wordpress.org/$file_wp
 fi
 
-
 tar zxf $file_wp
 # rm -rf *.tar.gz
 cd wordpress
