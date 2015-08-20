@@ -1,9 +1,9 @@
 ## 使用说明
 
-wget https://github.com/Deep-Time/dtwpos/archive/master.zip
-unzip dtwpos-master.zip
-cd dtwpos-master
-sh wpos.sh
+`wget https://github.com/Deep-Time/dtwpos/archive/master.zip`
+`unzip dtwpos-master.zip`
+`cd dtwpos-master`
+`sh wpos.sh`
 
 
 
