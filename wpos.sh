@@ -1,6 +1,10 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
+
+# Wordpress Optmize Setup Shell
+# Version:1.0.2
+
 # Current folder
 cur_dir=`pwd`
 WEBPATH="/www/web"
@@ -119,7 +123,7 @@ rm -rf wp-content/themes/twentyfourteen
 rm -rf wp-content/themes/twentythirteen
 rm -rf wp-content/plugins/hello.php
 rm -rf wp-content/plugins/akismet
-mv $cur_dir/dt_inc .
+cp -R $cur_dir/dt_inc .
 
 #6 修改wp配置文件
 sed -i '/WP_ZH_CN_ICP_NUM/ s/true/false/g' wp-config-sample.php
@@ -226,7 +230,7 @@ find wp-content/ -type f -exec chmod 664 {} \;
 chown -R www:www .
 
 mv ./* $WEBPATH/$VHOSTDIR
-
-
+cd ..
+rm -rf wordpress
 
 echo "安装成功......"
