@@ -13,13 +13,13 @@ cur_dir=`pwd`
 WEBPATH="/www/web"
 DATAPATH="/www/data"
 WPVER=""
+DB_HOST="deeptime.mysql.rds.aliyuncs.com"
 read -p "输入wordpress版本号！例如4.2.2：" WPVER
 while [ "$WPVER" = "" ]
 do
     read -p "输入wordpress版本号！例如4.2.2：" WPVER
 done
 echo "===========================ok"
-
 
 VHOSTDIR=""
 
@@ -38,8 +38,6 @@ do
 done
 echo "===========================ok"
 
-
-
 DB_NAME=""
 read -p "输入数据库名：" DB_NAME
 while ( [ -d "$DATAPATH/$DB_NAME" ] || [ "$DB_NAME" = "" ] )
@@ -47,8 +45,6 @@ do
     read -p "数据库已存在：" DB_NAME
 done
 echo "===========================ok"
-
-
 
 
 DB_USER=""
@@ -59,7 +55,6 @@ do
 done
 echo "===========================ok"
 
-
 DB_PASSWORD=""
 read -p "输入数据库密码：" DB_PASSWORD
 while [ "$DB_PASSWORD" = "" ]
@@ -68,22 +63,17 @@ do
 done
 echo "===========================ok"
 
+# MYSQL_CMD="mysql -u${DB_USER} -p${DB_PASSWORD} -h${DB_HOST}" #数据库登录信息
+# create_db_sql="create database IF NOT EXISTS ${DB_NAME}" #如果数据库不存在则创建
+# echo ${stop_create}${create_db_sql} | ${MYSQL_CMD} #创建数据库  
 
+# if [ $? -ne 0 ] #判断是否创建成功
+# then
+#  echo "创建数据库 ${DB_NAME} 失败 ..."
+#  exit 1
+# fi
 
-
-
-MYSQL_CMD="mysql -u${DB_USER} -p${DB_PASSWORD} -hdeeptime.mysql.rds.aliyuncs.com" #数据库登录信息
-create_db_sql="create database IF NOT EXISTS ${DB_NAME}" #如果数据库不存在则创建
-echo ${stop_create}${create_db_sql} | ${MYSQL_CMD} #创建数据库  
-
-if [ $? -ne 0 ] #判断是否创建成功
-then
- echo "创建数据库 ${DB_NAME} 失败 ..."
- exit 1
-fi
-
-echo "===========================ok"
-
+# echo "===========================ok"
 
 get_char()
 {
@@ -126,7 +116,6 @@ rm -rf wp-content/themes/twentyfourteen
 rm -rf wp-content/themes/twentythirteen
 rm -rf wp-content/plugins/hello.php
 rm -rf wp-content/plugins/akismet
-cp -R $cur_dir/dt_inc .
 
 #6 修改wp配置文件
 sed -i '/WP_ZH_CN_ICP_NUM/ s/true/false/g' wp-config-sample.php
@@ -137,7 +126,8 @@ sed -i '/DB_NAME/ s/database_name_here/'$DB_NAME'/g' wp-config-sample.php
 sed -i '/DB_USER/ s/username_here/'$DB_USER'/g' wp-config-sample.php
 # 设置密码
 sed -i '/DB_PASSWORD/ s/password_here/'$DB_PASSWORD'/g' wp-config-sample.php
-# 
+# 设置RDS远程数据库
+sed -i '/DB_HOST/ s/localhost/'$DB_HOST'/g' wp-config-sample.php
 # 
 AUTH_KEY=`cat /dev/urandom | head -1 | md5sum | head -c 32`
 SECURE_AUTH_KEY=`cat /dev/urandom | head -1 | md5sum | head -c 32`
@@ -181,7 +171,6 @@ sed -i '/medium_size_h/ s/300/0/g' wp-admin/includes/schema.php
 sed -i '/wp_dashboard_primary/ s/wp_add_dashboard_widget/\/\/wp_add_dashboard_widget/g' wp-admin/includes/dashboard.php
 
 
-
 cat >> wp-config-sample.php <<EOF
 
 #锁定网站域名
@@ -203,27 +192,29 @@ EOF
 
 mv wp-config-sample.php wp-config.php
 
+#2 替换wordpress中的google字体
+sed -i '/open_sans_font_url/ s/fonts.googleapis.com.*/oss.idzn.net\/fonts\/opensans.css\"\;/g' wp-includes/script-loader.php
+sed -i '/scripts/ s/ajax.googleapis.com/oss.idzn.net/g' wp-includes/script-loader.php
+sed -i '/oss.idzn.net/ s/https/http/g' wp-includes/script-loader.php
 
-#2 替换google字体
-sed -i 's/\/ajax.googleapis.com/dt_inc/g' wp-includes/script-loader.php
-sed -i '/googleapis/ s/\/fonts.googleapis.com.*\"/dt_inc\/fonts\/opensans.css\"/g' wp-includes/script-loader.php
-sed -i '/import/ s/\/fonts.googleapis.com.*\;/dt_inc\/fonts\/opensans.css\);/g' wp-includes/js/tinymce/plugins/compat3x/css/dialog.css
-sed -i '/import/ s/\/fonts.googleapis.com.*\;/dt_inc\/fonts\/opensans.css\);/g' wp-admin/css/press-this-editor-rtl.css
-sed -i '/import/ s/\/fonts.googleapis.com.*\;/dt_inc\/fonts\/opensans.css\);/g' wp-admin/css/press-this-editor.css
+
+sed -i '/open_sans_font_url/ s/fonts.googleapis.com\/css/oss.idzn.net\/fonts\/opensans.css/g' wp-admin/includes/class-wp-press-this.php
+sed -i '/oss.idzn.net/ s/https/http/g' wp-admin/includes/class-wp-press-this.php
+
+sed -i 's/fonts.googleapis.com.*/oss.idzn.net\/fonts\/opensans.css\")\;/g' wp-includes/js/tinymce/plugins/compat3x/css/dialog.css
+sed -i '/oss.idzn.net/ s/https/http/g' wp-includes/js/tinymce/plugins/compat3x/css/dialog.css
 
 
 #3替换2015主题中的Google字体
-sed -i 's/\/fonts.googleapis.com/dt_inc\/fonts/g' wp-content/themes/twentyfifteen/functions.php
+sed -i 's/fonts.googleapis.com\/css/oss.idzn.net\/fonts\/opensans.css/g' wp-content/themes/twentyfifteen/functions.php
+sed -i '/oss.idzn.net/ s/https/http/g' wp-content/themes/twentyfifteen/functions.php
 sed -i '/return/ s/\$fonts_url\;/\;/g' wp-content/themes/twentyfifteen/functions.php
-
 
 #4替换Revolution Slider v4.6.93中的Google字体
 #
 
-
 #5 替换Visual Composer v4.6.2 中的Google字体
 #
-
 
 
 #7 设置站点文件权限
