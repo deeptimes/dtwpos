@@ -192,30 +192,6 @@ EOF
 
 mv wp-config-sample.php wp-config.php
 
-#2 替换wordpress中的google字体
-sed -i '/open_sans_font_url/ s/fonts.googleapis.com.*/oss.idzn.net\/fonts\/opensans.css\"\;/g' wp-includes/script-loader.php
-sed -i '/scripts/ s/ajax.googleapis.com/oss.idzn.net/g' wp-includes/script-loader.php
-sed -i '/oss.idzn.net/ s/https/http/g' wp-includes/script-loader.php
-
-
-sed -i '/open_sans_font_url/ s/fonts.googleapis.com\/css/oss.idzn.net\/fonts\/opensans.css/g' wp-admin/includes/class-wp-press-this.php
-sed -i '/oss.idzn.net/ s/https/http/g' wp-admin/includes/class-wp-press-this.php
-
-sed -i 's/fonts.googleapis.com.*/oss.idzn.net\/fonts\/opensans.css\")\;/g' wp-includes/js/tinymce/plugins/compat3x/css/dialog.css
-sed -i '/oss.idzn.net/ s/https/http/g' wp-includes/js/tinymce/plugins/compat3x/css/dialog.css
-
-
-#3替换2015主题中的Google字体
-sed -i 's/fonts.googleapis.com\/css/oss.idzn.net\/fonts\/opensans.css/g' wp-content/themes/twentyfifteen/functions.php
-sed -i '/oss.idzn.net/ s/https/http/g' wp-content/themes/twentyfifteen/functions.php
-sed -i '/return/ s/\$fonts_url\;/\;/g' wp-content/themes/twentyfifteen/functions.php
-
-#4替换Revolution Slider v4.6.93中的Google字体
-#
-
-#5 替换Visual Composer v4.6.2 中的Google字体
-#
-
 
 #7 设置站点文件权限
 find . -type f -exec chmod 644 {} \;
