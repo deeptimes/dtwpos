@@ -1,75 +1,124 @@
 <?php
-/*
- * @Author: anchen
- * @Date:   2015-04-20 12:39:30
- * @Last Modified by:   anchen
- * @Last Modified time: 2015-04-20 14:05:47
- *
- * 该函数移除一个附属于指定动作hook的函数。该方法可用来移除附属于特定动作hook的默认函数，并可能用其它函数取而代之。
- * 请参考remove_filter(), add_action() and add_filter()等的用法
- * 注意：添加hook时的$function_to_remove 和$priority参数要能够相匹配，这样才可以移除hook。
- * 该原则也适用于过滤器和动作。移除失败时不进行警告提示。
- * 下面是它的一些参数：
- * A.$tag（字符串）（必需）将要被删除的函数所连接到的动作hook。默认值：None
- * B.$function_to_remove（回调）（必需） 将要被删除函数的名称默认值：None
- * C.$priority（整数）（可选）函数优先级（在函数最初连接时定义）默认值：10
- * D.$accepted_args（整数）（必需）函数所接受参数的数量。默认值：1
- * 它的返回值是布尔，只有是与否两种状态！由（布尔值）来判断函数是否被移除。
- * A.Ttue 函数被成功移除
- * B.False函数未被移除
+/**
+ * 
+ * @authors 深海时代（Deep-Time.com）
+ * @version Functions
  */
-
-
-remove_action( 'wp_head', 'feed_links', 2 ); //移除feed
-remove_action( 'wp_head', 'feed_links_extra', 3 ); //移除feed
-remove_action( 'wp_head', 'rsd_link' ); //移除离线编辑器开放接口
-remove_action( 'wp_head', 'wlwmanifest_link' );  //移除离线编辑器开放接口
-remove_action( 'wp_head', 'index_rel_link' );//去除本页唯一链接信息
-remove_action('wp_head', 'parent_post_rel_link', 10, 0 );//清除前后文信息
-remove_action('wp_head', 'start_post_rel_link', 10, 0 );//清除前后文信息
-remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0 );//未知
-remove_action('publish_future_post','check_and_publish_future_post',10, 1 );//未知
-remove_action( 'wp_head', 'noindex', 1 );//未知
-//remove_action( 'wp_head', 'wp_enqueue_scripts', 1 ); //Javascript的调用
-//remove_action( 'wp_head', 'locale_stylesheet' );//未知
-//remove_action( 'wp_head', 'wp_print_styles', 8 );//载入css
-//remove_action( 'wp_head', 'wp_print_head_scripts', 9 );//未知
-remove_action( 'wp_head', 'wp_generator' ); //移除WordPress版本
-
-remove_action( 'wp_head', 'rel_canonical' );//未知
-remove_action( 'wp_footer', 'wp_print_footer_scripts' );//未知
-remove_action( 'wp_head', 'wp_shortlink_wp_head', 10, 0 );//移除头部默认短链接
-remove_action( 'template_redirect', 'wp_shortlink_header', 11, 0 );//移除模版重定向默认短链接
-remove_action('wp_head', 'adjacent_posts_rel_link');//移除临近的文章链接
-
-remove_action('pre_post_update','wp_save_post_revision');//禁用修改历史记录
-
-remove_action( 'load-update-core.php', 'wp_update_themes' );//停用版本更新通知(Core)
-add_filter( 'pre_site_transient_update_themes', create_function( '$a', "return null;" ) );
-
-remove_action( 'load-update-core.php', 'wp_update_plugins' );//停用插件更新通知(Plugins)
-add_filter( 'pre_site_transient_update_plugins', create_function( '$a', "return null;" ) );
-
-remove_action ('load-update-core.php', 'wp_update_themes');//停用主题更新通知(Themes)
-add_filter( 'pre_site_transient_update_core', create_function( '$a', "return null;" ) );
-
-add_action('widgets_init', 'my_remove_recent_comments_style');//移除最近提交
-function my_remove_recent_comments_style() {
-    global $wp_widget_factory;
-    remove_action('wp_head', array($wp_widget_factory->widgets['WP_Widget_Recent_Comments'] ,'recent_comments_style'));
+/*---------------------------------------------------------*/
+//~ 载入 Bootstrap 菜单类
+require_once( get_template_directory() . '/inc/disable_remove.php' );
+require_once( get_template_directory() . '/inc/disable_embeds.php' );
+require_once( get_template_directory() . '/inc/plugins_optimized.php' );
+require_once( get_template_directory() . '/inc/navwalker.php' );
+if ( ! function_exists( 'facn_setup' ) ) :
+function facn_setup() {
+    //让wordpress管理文档标题
+    add_theme_support( 'title-tag' );
+    //~ 注册菜单
+    register_nav_menus( array(
+      'header_menu' => __( '顶部菜单', 'momo' ),
+      'hardware_menu' => __( '智能硬件横向菜单', 'momo' ),
+      'solution_menu' => __( '方案与案例横向菜单', 'momo' ),
+      'link_menu' => __( '友情连接', 'momo' ),
+      'footer_menu' => __( '底部菜单', 'momo' ),
+      'about_menu' => __( '关于我们', 'momo' ),
+      'host_menu' => __( '智能主机', 'momo' )
+    ) );
 }
-
-wp_deregister_script('l10n');//禁用l10n.js
-wp_deregister_script('autosave');//禁用自动保存草稿
-add_filter('show_admin_bar','__return_false');//彻底移除管理员工具条
-
-remove_filter('the_content','wpautop');//禁止自动给文章段落添加p标签
-remove_filter('the_excerpt','wpautop');//禁止自动给摘要段落添加p标签
-
-function sb_remove_script_version( $src ){
-    $parts = explode( '?', $src );
-    return $parts[0];
-}//去掉js和CSS的版本号
-add_filter( 'script_loader_src', 'sb_remove_script_version', 15, 1 );
-add_filter( 'style_loader_src', 'sb_remove_script_version', 15, 1 );
-
+endif;
+add_action( 'after_setup_theme', 'facn_setup' );
+/*===============页面头部加载Javascript and CSS============*/
+function reg_script() {
+  // 注册css样式 ，默认主样式main.css
+  wp_enqueue_style( 'bootstrap', get_template_directory_uri() . '/css/bootstrap.min.css');
+  wp_enqueue_style( 'font-awesome', get_template_directory_uri() . '/css/font-awesome.min.css');
+  wp_enqueue_style( 'megamenu', get_template_directory_uri() . '/css/megamenu.css');
+  wp_enqueue_style( 'animate', get_template_directory_uri() . '/js/monitor/animate.css');
+  wp_enqueue_style( 'slider', get_template_directory_uri() . '/css/slider.css');
+  wp_enqueue_style( 'slide_background', get_template_directory_uri() . '/css/slide_background.css');
+  wp_enqueue_style( 'slick', get_template_directory_uri() . '/css/slick.css');
+  wp_enqueue_style( 'zozotabs', get_template_directory_uri() . '/css/zozo.tabs.min.css');
+  wp_enqueue_style( 'mainstyle', get_template_directory_uri() . '/css/main.css');
+  wp_enqueue_style( 'mainstyle', get_template_directory_uri() . '/css/main.css');
+  wp_enqueue_style( 'just4ie', get_template_directory_uri() . '/css/ie.css' );
+  wp_style_add_data( 'just4ie', 'conditional', 'lt IE 9' );
+  // 注册js脚本,最后的true表示在footer加载
+  wp_register_script( 'jquerymin', get_template_directory_uri() . '/js/jquery-1.12.0.min.js',false,'','');
+  wp_enqueue_script( 'jquerymin' );
+  wp_register_script( 'bootstrap', get_template_directory_uri() . '/js/bootstrap.min.js',false,'',true);
+  wp_enqueue_script( 'bootstrap' );
+  wp_register_script( 'megamenu_plugins', get_template_directory_uri() . '/js/megamenu_plugins.js',false,'',true);
+  wp_enqueue_script( 'megamenu_plugins' );
+  wp_register_script( 'megamenu', get_template_directory_uri() . '/js/megamenu.js',false,'',true);
+  wp_enqueue_script( 'megamenu' );
+  wp_register_script( 'appear', get_template_directory_uri() . '/js/monitor/jquery.appear.js',false,'',true);
+  wp_enqueue_script( 'appear' );
+  wp_register_script( 'zozotabs', get_template_directory_uri() . '/js/zozo.tabs.min.js',false,'',true);
+  wp_enqueue_script( 'zozotabs' );
+  wp_register_script( 'slick', get_template_directory_uri() . '/js/slick.min.js',false,'',true);
+  wp_enqueue_script( 'slick' );
+  wp_register_script( 'jrating', get_template_directory_uri() . '/js/jrating.jquery.js',false,'',true);
+  wp_enqueue_script( 'jrating' );
+  wp_register_script( 'parallax', get_template_directory_uri() . '/js/jquery.parallax-1.1.3.js',false,'',true);
+  wp_enqueue_script( 'parallax' );
+  //自定义脚本
+  wp_register_script( 'plugins', get_template_directory_uri() . '/js/plugins_custom.js',false,'',true);
+  wp_enqueue_script( 'plugins' );
+  //IE9判断脚本
+  wp_register_script( 'html5shiv', get_template_directory_uri() . '/js/html5shiv.js',false,'','');
+  wp_script_add_data( 'html5shiv', 'conditional', 'lt IE 9' );
+  wp_enqueue_script( 'html5shiv' );
+  //删除已注册的系统自带的Jquery脚本
+  wp_deregister_script( 'jquery' );
+}
+add_action( 'wp_enqueue_scripts', 'reg_script' );
+function momo_get_the_thumbnail( $size = 'post-thumbnail' ) {
+  $image_url = '';
+  if ( has_post_thumbnail() ) {
+    $image_url = wp_get_attachment_image_src( get_post_thumbnail_id() , full);
+    $image_url = $image_url[0];
+  } else {
+    global $post;
+    $output = preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $post->post_content, $matches);
+    if($output) $image_url = $matches[1][0];
+  }
+  if($image_url){
+    return $image_url;
+  }
+}
+function dmeng_get_current_page_url(){
+  $ssl = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true:false;
+    $sp = strtolower($_SERVER['SERVER_PROTOCOL']);
+    $protocol = substr($sp, 0, strpos($sp, '/')) . (($ssl) ? 's' : '');
+    $port  = $_SERVER['SERVER_PORT'];
+    $port = ((!$ssl && $port=='80') || ($ssl && $port=='443')) ? '' : ':'.$port;
+    $host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
+    return $protocol . '://' . $host . $port . $_SERVER['REQUEST_URI'];
+}
+function momo_add_excerpts_to_pages() {
+    add_post_type_support( 'product', array( 'excerpt' ) );
+}
+add_action( 'init', 'momo_add_excerpts_to_pages' );
+//统计文章浏览次数
+function getPostViews($postID){
+    $count_key = 'post_views_count';
+    $count = get_post_meta($postID, $count_key, true);
+    if($count==''){
+        delete_post_meta($postID, $count_key);
+        add_post_meta($postID, $count_key, '0');
+        return "0";
+    }
+    return $count;
+}
+function setPostViews($postID) {
+    $count_key = 'post_views_count';
+    $count = get_post_meta($postID, $count_key, true);
+    if($count==''){
+        $count = 0;
+        delete_post_meta($postID, $count_key);
+        add_post_meta($postID, $count_key, '0');
+    }else{
+        $count++;
+        update_post_meta($postID, $count_key, $count);
+    }
+}
