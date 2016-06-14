@@ -329,8 +329,8 @@ define('WP_POST_REVISIONS', false); # 屏蔽日志修订
 define('AUTOSAVE_INTERVAL', false); # 禁用自动保存
 define('DISABLE_WP_CRON', true); # 关闭计划任务
 define('AUTOMATIC_UPDATER_DISABLED', true); # 禁止全部自动更新
-define('DISALLOW_FILE_EDIT', true); # 禁用主题编辑功能
-define('DISALLOW_FILE_MODS',true); # 禁用后台主题上传安装功能
+define('DISALLOW_FILE_EDIT', false); # 禁用主题编辑功能
+define('DISALLOW_FILE_MODS',false); # 禁用后台主题上传安装功能
 define('WP_HTTP_BLOCK_EXTERNAL', true); # 屏蔽外部请求
 define('WP_ACCESSIBLE_HOSTS', '*.w.org,*.wordpress.org'); # 设置白名单
 # 锁定网站域名
